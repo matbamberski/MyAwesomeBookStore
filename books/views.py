@@ -72,7 +72,7 @@ class BookListing(ListAPIView):
         query_list = Book.objects.all()
         category = self.request.query_params.get('category', None)
         author = self.request.query_params.get('author', None)
-        print(author, category)
+        # print(author, category)
         try:
             authors = Author.objects.filter(
                 Q(surname__icontains=author) | Q(name__icontains=author)
@@ -88,5 +88,5 @@ class BookListing(ListAPIView):
             query_list = query_list.filter(
             categories__in=categories
             )
-        print(query_list)
+        # print(query_list)
         return query_list.distinct()
