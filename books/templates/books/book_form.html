@@ -11,6 +11,7 @@
             <div class="col-md-10 mb-4">
                 <div class="jumbotron">
                     <h1 class="text-center display-6">BookStore</h1>
+                    <p class="text-center">Created by: Mateusz Bamberski</p>
                 </div>
             <div class="content-section">
                 <form method="POST">
@@ -19,6 +20,7 @@
                     <fieldset class="form-group">
                         <legend class="border-bottom mb-4">New Book</legend>
                         <p>Please fill the form to add the book. In case you can't find the author or category in lists please add them using buttons.</p>
+                        <p>Hold down "Control", or "Command" on a Mac, to select more than one author or category.</p>
                         <button class="add-author-btn btn btn-primary" type="button" name="button">Add author</button>
                         <button class="add-category-btn btn btn-primary" type="button" name="button">Add category</button>
                         {{ form|crispy }}
