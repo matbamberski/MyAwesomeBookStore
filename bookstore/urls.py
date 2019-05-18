@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^book/', include(('books.urls', 'book'), namespace='book')),
+    url(r'^.*$', RedirectView.as_view(url='book/', permanent=True)),
 ]
