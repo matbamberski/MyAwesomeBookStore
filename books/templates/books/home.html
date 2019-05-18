@@ -1,0 +1,192 @@
+{% extends "books/base.html" %}
+{% load static %}
+{% block head %}
+{% endblock %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<section class="site_filter">
+	<div class="row justify-content-center">
+		<div class="col-md-10 mb-4">
+			<div class="jumbotron">
+				<h1 class="text-center display-6">BookStore</h1>
+			</div>
+			<div class="container-fluid row justify-content-center">
+				<div class="col-4">
+					<label>Search authors</label>
+					<input type="search" class="form-control" id="authors" placeholder="Author...">   
+				</div>
+				<div class="col-4">
+					<label>Search categories</label>
+					<input type="search" class="form-control" id="categories" placeholder="Category...">
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<section>
+	<div class="row justify-content-center">
+		<div class="col-md-10">
+			<div class="container-fluid">
+				<div class="row properties_table justify-content-center" id = "book_info">
+					<table class="table table-stripped table-fixed">
+						<thead>
+							<tr>
+								<td>Title</td>
+								<td>Authors</td>
+								<td>Category</td>
+								<td>Description</td>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div class="row justify-content-center">
+					<nav aria-label="navigation">
+						<ul class="pagination">
+							<li class="page-item">
+								<button class="btn btn-primary page-link" id="previous">Previous</button>
+							</li>
+							<li class="page-item pull-right">
+								<button class="btn btn-primary page-link" id="next">Next</button>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %}
+{% block script %}
+<script type="text/javascript">
+var send_data = {}	
+$(document).ready(function(){
+    reset();
+
+    getData();
+
+    $("#authors").change(function(e){
+        if(this.value == "")
+            send_data['author'] = "";
+        else
+            send_data['author'] = this.value;
+        
+        getData();
+    });
+
+    $('#categories').change(function(e){
+        if(this.value == "")
+            send_data['category'] = "";
+        else
+            send_data['category'] = this.value;
+        
+        getData();
+    });
+
+    $("#display_all").click(function(){
+        reset();
+        getData();
+    })
+})
+
+function reset() {
+	send_data['author'] = "";
+	send_data['category'] = "";
+}
+
+function printData(response) {
+	$("#book_info table tbody").html("");
+	if(response["results"].length > 0){
+		$.each(response["results"], function (a, entry){
+			var cat = entry.categories.flatMap(c => c.category_name).join();
+			var aut = entry.authors.flatMap(a => a.name + " " + a.surname).join();
+
+			$("#book_info table tbody").append(`<tr>
+				<td>${entry.title.slice(0,30) || "-"}</td>
+				// <td>${aut || "-"}</td>
+				// <td>${cat || "-"}</td>
+				<td>${entry.description.length > 200 ? entry.description.slice(0,200)  + "..." : entry.description|| "-"}</td>
+				</tr>`);
+		})
+
+	}
+	let prev_url = response["previous"];
+    let next_url = response["next"];
+
+    if (prev_url === null) {
+        $("#previous").addClass("disabled");
+        $("#previous").prop('disabled', true);
+    } else {
+        $("#previous").removeClass("disabled");
+        $("#previous").prop('disabled', false);
+    }
+    if (next_url === null) {
+        $("#next").addClass("disabled");
+        $("#next").prop('disabled', true);
+    } else {
+        $("#next").removeClass("disabled");
+        $("#next").prop('disabled', false);
+    }
+    $("#previous").attr("url", response["previous"]);
+    $("#next").attr("url", response["next"]);
+
+}
+
+
+
+$("#next").click(function () {
+    let url = $(this).attr("url");
+    if (!url)
+        $(this).prop('all', true);
+
+    $(this).prop('all', false);
+    $.ajax({
+        method: 'GET',
+        url: url,
+        success: function (response) {
+            printData(response);
+        },
+        error: function(response){
+            console.log(response)
+        }
+    });
+})
+
+$("#previous").click(function () {
+    let url = $(this).attr("url");
+    if (!url)
+        $(this).prop('all', true);
+
+    $(this).prop('all', false);
+    $.ajax({
+        method: 'GET',
+        url: url,
+        success: function (response) {
+            printData(response);
+        },
+        error: function(response){
+            console.log(response)
+        }
+    });
+})
+
+function getData() {
+
+
+	$.ajax({
+		method: 'GET',
+		url: '{% url "book:listing" %}',
+		data: send_data,
+		success: function(response) {
+			console.log(send_data);
+			printData(response);
+		},
+		error: function (response) {
+			console.log(response);
+		}
+	});
+}
+</script>
+{% endblock %}

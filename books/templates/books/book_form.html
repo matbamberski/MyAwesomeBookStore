@@ -1,0 +1,42 @@
+{% extends "books/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content"></div>
+    </div>
+</div>
+<section class="site_filter">
+        <div class="row justify-content-center">
+            <div class="col-md-10 mb-4">
+                <div class="jumbotron">
+                    <h1 class="text-center display-6">BookStore</h1>
+                </div>
+            <div class="content-section">
+                <form method="POST">
+                    <!-- ADD CSRF TOKEN -->
+                    {% csrf_token %}
+                    <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">New Book</legend>
+                        <p>Please fill the form to add the book. In case you can't find the author or category in lists please add them using buttons.</p>
+                        <button class="add-author-btn btn btn-primary" type="button" name="button">Add author</button>
+                        <button class="add-category-btn btn btn-primary" type="button" name="button">Add category</button>
+                        {{ form|crispy }}
+                    </fieldset>
+                    <div class="form-group">
+                        <button class="btn btn-outline-info" type="submit">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>    
+{% block script %}
+<script type="text/javascript">
+    $(function () {
+      $(".add-author-btn").modalForm({formURL: "{% url 'book:add-author' %}"});
+      $(".add-category-btn").modalForm({formURL: "{% url 'book:add-category' %}"});
+    });
+  </script>
+{% endblock %}
+{% endblock content%}
