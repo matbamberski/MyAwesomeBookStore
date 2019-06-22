@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.urls import reverse_lazy
 from .models import Book, Category, Author
-from .forms import ImportBookForm, CreateAuthorForm, CreateCategoryForm
+from .forms import ImportBookForm, CreateAuthorForm, CreateCategoryForm, BookCreateForm
 from .serializers import json2obj, AuthorSerializer, CategorySerializer, BookSerializer
 from .pagination import StandartResutlsSetPagination
 from rest_framework.generics import ListAPIView
@@ -27,7 +27,8 @@ class BookListView(ListView):
 
 class BookCreateView(CreateView):
     model = Book
-    fields = ['title', 'authors', 'categories', 'description']
+    form_class = BookCreateForm
+
 
 class AddAuthor(PassRequestMixin, SuccessMessageMixin, CreateView):
     form_class = CreateAuthorForm

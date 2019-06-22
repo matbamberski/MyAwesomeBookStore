@@ -3,7 +3,7 @@ from .models import Book, Author, Category, DEFAULT_DESCRIPTION
 
 
 def json2obj(result):
-    if result['success']==True and 'items' in result:
+    if result['success'] and 'items' in result:
         json = result['items']
         for volumen in json:
             authors = []
@@ -14,7 +14,10 @@ def json2obj(result):
                         'name': " ".join(author_name[:-1]),
                         'surname': author_name[-1]
                     }
-                    author_obj = Author.objects.filter(name=data_author['name'], surname=data_author['surname']).first()
+                    author_obj = Author.objects.filter(
+                        name=data_author['name'],
+                        surname=data_author['surname']
+                        ).first()
                     if not author_obj:
                         author_obj = Author.objects.create(**data_author)
                     author_obj.save()
@@ -26,7 +29,9 @@ def json2obj(result):
                     data_category = {
                         'category_name': category
                     }
-                    category_obj = Category.objects.filter(category_name=data_category['category_name']).first()
+                    category_obj = Category.objects.filter(
+                        category_name=data_category['category_name']
+                        ).first()
                     if not category_obj:
                         category_obj = Category.objects.create(**data_category)
                     category_obj.save()
@@ -36,9 +41,15 @@ def json2obj(result):
             if 'description' in volumen['volumeInfo']:
                 description = volumen['volumeInfo']['description']
 
-            new_book = Book.objects.filter(title=volumen['volumeInfo']['title'], description=description).first()
+            new_book = Book.objects.filter(
+                title=volumen['volumeInfo']['title'],
+                description=description
+                ).first()
             if not new_book:
-                new_book = Book.objects.create(title=volumen['volumeInfo']['title'], description=description)
+                new_book = Book.objects.create(
+                    title=volumen['volumeInfo']['title'],
+                    description=description
+                    )
                 new_book.save()
                 new_book.authors.add(*authors)
                 new_book.categories.add(*categories)
@@ -58,8 +69,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class BookSerializer(serializers.ModelSerializer):
     authors = AuthorSerializer(many=True, read_only=True)
-    categories  = CategorySerializer(many=True, read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Book
         fields = ('id', 'title', 'authors', 'categories', 'description')
+        

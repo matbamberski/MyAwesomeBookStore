@@ -1,5 +1,5 @@
 from django import forms
-from .models import Author, Category
+from .models import Author, Category, Book
 import requests
 from urllib.parse import urlencode, quote
 from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
@@ -77,3 +77,20 @@ class CreateCategoryForm(PopRequestMixin, CreateUpdateAjaxMixin, CategoryForm):
     class Meta:
         model = Category
         fields = ['category_name']
+
+class BookCreateForm(forms.ModelForm):
+    
+    class Meta:
+        model = Book
+        fields = ['title', 'authors', 'categories', 'description']
+
+    def clean(self):
+        cleaned_data = super(BookCreateForm, self).clean()
+        if Book.objects.filter(
+            title=cleaned_data['title'], 
+            authors__id__in=cleaned_data['authors'],
+            categories__id__in=cleaned_data['categories'],
+            description=cleaned_data['description']
+            ).exists():
+            raise forms.ValidationError('This book already exists!')
+        return cleaned_data
